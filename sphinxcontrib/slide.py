@@ -116,10 +116,10 @@ def html_visit_slide_node(self, node):
     options = node['slide_options']
 
     if options['type'] == 'googledocs':
-        template = """<iframe src="%s" frameborder="0" width="480" height="375" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>"""
+        template = """<iframe src="%s" frameborder="0" width="480" height="375" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"> </iframe>"""
         self.body.append(template % options.get('embed_url'))
     elif options['type'] == 'slideshare':
-        template = """<iframe src="%s" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="%s" title="%s" target="_blank">%s</a> </strong> from <strong><a href="%s" target="_blank">%s</a></strong> </div>"""
+        template = """<iframe src="%s" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen="true"> </iframe> <div style="margin-bottom:5px"> <strong> <a href="%s" title="%s" target="_blank">%s</a> </strong> from <strong><a href="%s" target="_blank">%s</a></strong> </div>"""
         self.body.append(template % (options.get('embed_url'),
                                      node.get('url'),
                                      options.get('title', ""),
@@ -127,7 +127,7 @@ def html_visit_slide_node(self, node):
                                      options.get('author_url'),
                                      options.get('author_name', "")))
     elif options['type'] == 'speakerdeck':
-        template = """<script async class="speakerdeck-embed" data-id="%s" data-ratio="%s" src="//speakerdeck.com/assets/embed.js"></script>"""
+        template = """<script async="async" class="speakerdeck-embed" data-id="%s" data-ratio="%s" src="//speakerdeck.com/assets/embed.js"> </script>"""
         self.body.append(template % (options.get('data_id'), options.get('data_ratio')))
 
 
