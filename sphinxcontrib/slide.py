@@ -46,6 +46,8 @@ def get_slide_options(url):
         return get_slide_options_for_slideshare(url)
     elif re.match('https://speakerdeck.com/', url):
         return get_slide_options_for_speakerdeck(url)
+    elif re.match('https?://slides.com/', url):
+        return get_slide_options_for_slides_com(url)
     else:
         msg = 'unknown slide URL: %s' % url
         raise Exception(msg)
@@ -111,6 +113,19 @@ def get_slide_options_for_speakerdeck(url):
     return options
 
 
+def get_slide_options_for_slides_com(url):
+    options = {}
+    options['type'] = 'slides.com'
+    options['embed_url'] = re.sub('https?:', '', re.sub('#/$', '', url)) + '/embed'
+
+    content = urllib2.urlopen(url).read()
+    matched = re.search('<h4>(.*?)</h4>', content)
+    if matched:
+        options['title'] = matched.group(1).decode('utf-8')
+
+    return options
+
+
 def html_visit_slide_node(self, node):
     options = node['slide_options']
 
@@ -128,6 +143,11 @@ def html_visit_slide_node(self, node):
     elif options['type'] == 'speakerdeck':
         template = """<script async="async" class="speakerdeck-embed" data-id="%s" data-ratio="%s" src="//speakerdeck.com/assets/embed.js"> </script>"""
         self.body.append(template % (options.get('data_id'), options.get('data_ratio')))
+    elif options['type'] == 'slides.com':
+        template = ('<iframe src="%s" width="576" height="420" scrolling="no"'
+                    ' frameborder="0" webkitallowfullscreen mozallowfullscreen'
+                    ' allowfullscreen></iframe>')
+        self.body.append(template % options.get('embed_url'))
 
 
 def latex_visit_slide_node(self, node):

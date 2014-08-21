@@ -52,7 +52,7 @@ Directive
 .. describe:: .. slide:: [URL]
 
    This directive insert slide interface into the generated document.
-   sphinxcontrib-slide supports presentations on slideshare, googledocs and speakerdeck. 
+   sphinxcontrib-slide supports presentations on slideshare, googledocs, speakerdeck and slides.com.
 
    Examples::
 
