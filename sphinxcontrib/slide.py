@@ -8,9 +8,10 @@
 """
 
 import re
-import urllib2
+from urllib.request import urlopen
+
 from docutils import nodes
-from sphinx.util.compat import Directive
+from docutils.parsers.rst import Directive
 
 
 class slide(nodes.General, nodes.Element):
@@ -34,13 +35,13 @@ class SlideDirective(Directive):
             node['slide_options'] = get_slide_options(self.arguments[0])
 
             return [node]
-        except Exception, e:
+        except Exception as e:
             reporter = self.state.document.reporter
             return [reporter.warning(str(e), line=self.lineno)]
 
 
 def get_slide_options(url):
-    if re.match('https://docs.google.com/presentation/(pub\?|d/)', url):
+    if re.match(r'https://docs.google.com/presentation/(pub\?|d/)', url):
         return get_slide_options_for_googledocs(url)
     elif re.match('http://www.slideshare.net/', url):
         return get_slide_options_for_slideshare(url)
@@ -57,14 +58,16 @@ def get_slide_options_for_googledocs(url):
     options = {}
     options['type'] = 'googledocs'
     if re.search('/presentation/pub', url):
-        options['embed_url'] = re.sub('/pub\?', '/embed?', url)
+        options['embed_url'] = re.sub(r'/pub\?', '/embed?', url)
     elif re.search('/presentation/d/', url):
         options['embed_url'] = re.sub('/edit.*', '', re.sub('/d/', '/embed?id=', url))
 
-    content = urllib2.urlopen(url).read()
+    with urlopen(url) as r:
+        content = r.read().decode()
+
     matched = re.search('<title>(.*?)</title>', content)
     if matched:
-        options['title'] = matched.group(1).decode('utf-8')
+        options['title'] = matched.group(1)
 
     return options
 
@@ -73,22 +76,24 @@ def get_slide_options_for_slideshare(url):
     options = {}
     options['type'] = 'slideshare'
 
-    content = urllib2.urlopen(url).read()
-    matched = re.search('http://www.slideshare.net/slideshow/embed_code/\d+', content)
+    with urlopen(url) as r:
+        content = r.read().decode()
+
+    matched = re.search(r'"(https://www.slideshare.net/slideshow/embed_code/.*)"', content)
     if matched:
-        options['embed_url'] = matched.group(0)
+        options['embed_url'] = matched.group(1)
 
     matched = re.search('<title>(.*?)</title>', content)
     if matched:
-        options['title'] = matched.group(1).decode('utf-8')
+        options['title'] = matched.group(1)
 
-    matched = re.search('<meta name="slideshow_author".*? content="(.*?)" />', content)
+    matched = re.search('<meta content="(.*?)".*? name="slideshow_author" />', content)
     if matched:
         options['author_url'] = matched.group(1)
 
-    matched = re.search('<img class="h-author-image".*? alt="(.*?)" width="50" />', content)
+    matched = re.search('<img alt="(.*?)" class="author-photo".*? />', content)
     if matched:
-        options['author_name'] = matched.group(1).decode('utf-8')
+        options['author_name'] = matched.group(1)
 
     return options
 
@@ -97,18 +102,20 @@ def get_slide_options_for_speakerdeck(url):
     options = {}
     options['type'] = 'speakerdeck'
 
-    content = urllib2.urlopen(url).read()
+    with urlopen(url) as r:
+        content = r.read().decode()
+
     matched = re.search('<h1>(.*?)</h1>', content)
     if matched:
-        options['title'] = matched.group(1).decode('utf-8')
+        options['title'] = matched.group(1)
 
     matched = re.search('data-id="(.*?)"', content)
     if matched:
-        options['data_id'] = matched.group(1).decode('utf-8')
+        options['data_id'] = matched.group(1)
 
     matched = re.search('data-ratio="(.*?)"', content)
     if matched:
-        options['data_ratio'] = matched.group(1).decode('utf-8')
+        options['data_ratio'] = matched.group(1)
 
     return options
 
@@ -118,10 +125,12 @@ def get_slide_options_for_slides_com(url):
     options['type'] = 'slides.com'
     options['embed_url'] = re.sub('https?:', '', re.sub('#/$', '', url)) + '/embed'
 
-    content = urllib2.urlopen(url).read()
+    with urlopen(url) as r:
+        content = r.read().decode()
+
     matched = re.search('<h4>(.*?)</h4>', content)
     if matched:
-        options['title'] = matched.group(1).decode('utf-8')
+        options['title'] = matched.group(1)
 
     return options
 
