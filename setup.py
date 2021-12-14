@@ -18,7 +18,7 @@ requires = ['Sphinx>=0.6', 'setuptools']
 
 setup(
     name='sphinxcontrib-slide',
-    version='0.3.0',
+    version='1.0.0',
     url='https://github.com/sphinx-contrib/slide',
     download_url='https://pypi.org/project/sphinxcontrib-slide/',
     license='BSD',
