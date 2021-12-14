@@ -20,3 +20,11 @@ def test_googledocs(app):
     content = (app.outdir / 'index.html').read_text()
     assert ('<iframe src="https://docs.google.com/presentation/embed?id=1GzGae1_uB05-8tJZChOJdTuuP4XFJWuak7etHKEvJqQ"'
             in content)
+
+
+@pytest.mark.sphinx(testroot='speakerdeck.com')
+def test_speakerdeck(app):
+    app.build()
+
+    content = (app.outdir / 'index.html').read_text()
+    assert '<script async="async" class="speakerdeck-embed" data-id="c353292856a24fafa657f06778477ee1"' in content
