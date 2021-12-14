@@ -28,3 +28,11 @@ def test_speakerdeck(app):
 
     content = (app.outdir / 'index.html').read_text()
     assert '<script async="async" class="speakerdeck-embed" data-id="c353292856a24fafa657f06778477ee1"' in content
+
+
+@pytest.mark.sphinx(testroot='slides.com')
+def test_slides_com(app):
+    app.build()
+
+    content = (app.outdir / 'index.html').read_text()
+    assert '<iframe src="//slides.com/rtrajano/sphinx-and-read-the-docs/embed"' in content
