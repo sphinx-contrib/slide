@@ -79,19 +79,19 @@ def get_slide_options_for_slideshare(url):
     with urlopen(url) as r:
         content = r.read().decode()
 
-    matched = re.search(r'http://www.slideshare.net/slideshow/embed_code/\d+', content)
+    matched = re.search(r'"(https://www.slideshare.net/slideshow/embed_code/.*)"', content)
     if matched:
-        options['embed_url'] = matched.group(0)
+        options['embed_url'] = matched.group(1)
 
     matched = re.search('<title>(.*?)</title>', content)
     if matched:
         options['title'] = matched.group(1)
 
-    matched = re.search('<meta name="slideshow_author".*? content="(.*?)" />', content)
+    matched = re.search('<meta content="(.*?)".*? name="slideshow_author" />', content)
     if matched:
         options['author_url'] = matched.group(1)
 
-    matched = re.search('<img class="h-author-image".*? alt="(.*?)" width="50" />', content)
+    matched = re.search('<img alt="(.*?)" class="author-photo".*? />', content)
     if matched:
         options['author_name'] = matched.group(1)
 
